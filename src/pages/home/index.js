@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react'
 import {
     View,
     StyleSheet,
@@ -5,10 +6,13 @@ import {
     TouchableOpacity,
     StatusBar,
     Platform,
-    FlatList
+    FlatList,
+    Dimensions
 } from 'react-native'
 
 import { FeedItem } from '../../components/FeedItem'
+
+const { height: heightScreen } = Dimensions.get("screen")
 
 export function Home() {
 
@@ -16,8 +20,8 @@ export function Home() {
         {
           id: '1', 
           video: 'https://i.imgur.com/Cnz1CPK.mp4',
-          name: '@sujeitoprogramador',
-          description: 'Criando o ShortDev do zero com RN',
+          name: '@RobertoFernades',
+          description: 'Criando o ShortDev do zero com React Native',
          },
         {
           id: '2', 
@@ -28,10 +32,17 @@ export function Home() {
         {
           id: '3', 
           video: 'https://i.imgur.com/mPFvFyX.mp4',
-          name: '@sujeitoprogramador',
+          name: '@RobertoFernandes',
           description: 'Aprendendo a trabalhar com Drag and Drop no React Native',
          }
-      ] 
+    ] 
+    
+    const [showItem, setShowItem] = useState(feedItems[0])
+    const onViewRef = useRef(({viewableItems}) => {
+        if (viewableItems && viewableItems.length > 0) { 
+            setShowItem(feedItems[viewableItems[0].index])
+        }
+    })
 
     return (
         <View style={styles.container}>
@@ -49,8 +60,17 @@ export function Home() {
 
             <FlatList
                 data={feedItems}
-                renderItem={({ item }) => <FeedItem data={item} /> }
-            
+                renderItem={({ item }) => <FeedItem data={item}
+                    currentVisibleItem={showItem} />}
+                onViewableItemsChanged={onViewRef.current}
+                snapToAlignment='center'
+                snapToInterval={heightScreen}
+                scrollEventThrottle={100}
+                decelerationRate={"fast"}
+                viewabilityConfig={{
+                    waitForInteraction: false,
+                    viewAreaCoveragePercentThreshold: 100
+                }}
             />
 
         </View>
